@@ -6,7 +6,7 @@ import pydeck as pdk
 import plotly.express as px
 
 def get_dataframes():
-    directory = 'data'
+    directory = 'Data'
     dfs = {}
     for filename in os.listdir(directory):
         dfs[filename.removeprefix('serial_killers_').removesuffix('.csv')] = pd.read_csv(directory +'/'+ filename).iloc[: , 1:]
