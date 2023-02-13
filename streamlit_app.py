@@ -34,8 +34,8 @@ fig = px.choropleth(
     countries,
     locations="Country Code",
     color="Total",
-    hover_name="Country",
-    range_color=[20,80])
+    hover_name="Country",¨
+    color_continuous_scale=px.colors.sequential.Plasma)
 
 if st.checkbox('Show temporary charts'):
     st.plotly_chart(pie, use_container_width=True)
