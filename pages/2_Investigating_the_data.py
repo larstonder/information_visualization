@@ -20,7 +20,7 @@ countries = dfs['countries']
 
 education = dfs['education_stats']
 education = pd.DataFrame(np.vstack([education.columns, education])).T
-education.columns=['Education', 'Percent']
+education.columns=['Education', 'Number of people']
 
 mental = dfs['mental_conditions']
 victims = dfs['most_victims']
@@ -68,7 +68,8 @@ if st.session_state.page == 0: # INTRO
 elif st.session_state.page == 1: # ORIGINS
     st.markdown("""
         # Origins
-        As shown in the map below, ... 
+        As shown in the map below, there doesn't seem to be many other countries that the US that struggle
+        with many serial killers.
     """)
     fig = px.choropleth(
         countries,
@@ -80,13 +81,21 @@ elif st.session_state.page == 1: # ORIGINS
     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, geo_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(fig, use_container_width=True)
 
-    st.write("The US has many more ...")
+    st.markdown("""
+        The following chart confirms our supsicions that were discussed earlier.
+        The US has almost ***five times*** as many serial killers than the next country on the list, which is
+        Russia (we also have the Soviet Union, but we only discuss current countries).
+    """)
     bar = px.bar(countries, y='Total', x='Country')
     st.plotly_chart(bar, use_container_width=True)
 
     st.markdown("""
         ## Serial killers per 100, 000 people
-        Something about iceland and Estonia
+        While the US still ranks highly when counting the number of serial killers per 100, 000 people,
+        we now have some interesting outliers that we coulnd't see before. As an example,
+        countries such as Australia actually ranks higher, with approximately 0.02 more serial killers
+        per 100, 000 than the US. Surprisingly, the two highest ranking countries are Iceland and Estonia,
+        with respectively 0.27 and 0.29 serial killers per 100, 000 people.
     """)
     fig = px.choropleth(
         countries,
@@ -124,12 +133,17 @@ elif st.session_state.page == 2: # Genders
 elif st.session_state.page == 3: # Education
     st.markdown("""
         # Education
-        Need some comments here
+        We might have thought that serial killers must be really smart and savvy.
+        As listed below, only 30% of the total amount had higher education.
+        While quite a few who initially enrolled in college didn't make it all the way to a degree,some did.
+        A few went even further. The degrees at tend to cluster in certain areas:
+        medicine, education, the social sciences, or a practical discipline.
     """)
     # st.write(education)
     fig = px.pie(
         education,
-        values='Percent'
+        values='Number of people',
+        names='Education'
     )
     st.plotly_chart(fig, use_container_width=True)
 
@@ -141,7 +155,7 @@ elif st.session_state.page == 4: #
     
     if options == 'Total':
         st.markdown("""
-            Here we can see the 10 most common occupations in total. Etc.
+            Here we can see the 10 most common occupations in total.
         """)
         fig = px.bar(
             occupation[:10],
@@ -149,20 +163,30 @@ elif st.session_state.page == 4: #
             y=["Male", "Female"])
         st.plotly_chart(fig, use_container_width=True)
     elif options == 'Male':
-        st.write("Here we can see the 10 most common occupations for males. Etc.")
+        st.write("Here we can see the 10 most common occupations for males.")
         fig = px.bar(
             occupation.iloc[:, [0,1]].sort_values(by="Male", ascending=False)[:10],
             x="Occupation",
             y="Male")
         st.plotly_chart(fig, use_container_width=True)
     elif options == 'Female':
-        st.write("Here we can see the 10 most common occupations for females. Etc.")
+        st.write("Here we can see the 10 most common occupations for females.")
         fig = px.bar(
             occupation.iloc[:, [0,2]].sort_values(by="Female", ascending=False)[:10],
             x="Occupation",
             y="Female")
         st.plotly_chart(fig, use_container_width=True)
-
+    
+    st.markdown("""
+        Taken as a whole, certain patterns emerge in the occupations chosen by serial killers,
+        with some full-time and part-time jobs over-represented.
+        So much so, in fact, that over the last 50 years, some dominant patterns have emerged.
+        Obviously, not everyone occupying these jobs is a serial killer,
+        nor are they likely to become one.
+        But there's something about these jobs that is inherently appealing to offenders,
+        or that otherwise cultivates the impulses of serial killers-in-waiting and causes
+        them to be curiously over-represented among this rare breed of murderer.
+    """)
 
 elif st.session_state.page == 5: # Mental conditions
     st.markdown("""
@@ -173,6 +197,20 @@ elif st.session_state.page == 5: # Mental conditions
         'What gender do you wish to view data for?',
         ('Total', 'Female', 'Male')
         )
+    
+    st.markdown("""
+        In the wake of a violent murder forensic psychologists typically examine the mental
+        correlates of criminality. In order to get to the root of a behavior,
+        these justice system professionals will often ask such questions as:
+
+        * Did the accused have a troubled childhood?
+        * Does (s)he exhibit empathy for others?
+        * Does (s)he self-medicate with drugs or alcohol?
+
+        Not surprisingly, many criminals have been diagnosed with mental illnesses
+        and may be suffering from co-occurring substance abuse.
+        So what are some of the most common psychological disorders associated with serial killers?
+    """)
     
     mental = mental[mental['Total'] != 0]
     mental['Rank'] = range(1, len(mental)+1)
@@ -190,20 +228,35 @@ elif st.session_state.page == 5: # Mental conditions
     if options == 'Total':
         # st.dataframe(penalty.iloc[:,[0,1,2,3]][:10], use_container_width=True)
         st.markdown("""
-            Here we can see the ten most common mental illnesses.
+            Here we can see the ten most common mental illnesses across all genders.
         """)
         fig = px.bar(mental[:10], x='Mental Illness', y=['Male', 'Female'])
         st.plotly_chart(fig, use_container_width=True)
     elif options == 'Male':
         # st.dataframe(penalty_male.iloc[:, [0,1]], use_container_width=True)
-        st.write("What can we see from this data?")
+        st.markdown("""
+            For the males, most of the diagnosed serial killers was diagnosed with
+            antisocial personality disorder.
+        """)
         fig = px.bar(mental_male[:10], x='Mental Illness', y='Male')
         st.plotly_chart(fig, use_container_width=True)
     elif options == 'Female':
-        st.write("What can we see from this data?")
+        st.markdown("""
+            Interestingly, of all the female serial killers, only one has been diagnosed with
+            a mental illness.
+        """)
         # st.dataframe(penalty_female.iloc[:, [0,1]], use_container_width=True)
         fig = px.bar(mental_female[:10], x='Mental Illness', y='Female')
         st.plotly_chart(fig, use_container_width=True)
+    
+    st.markdown("""
+        Mental illnesses have been found in some of the serial killers,
+        but it's important to note that most people suffering from these
+        illnesses do not commit any violent offenses.
+        These instances of mental disorders represent only a small fraction
+        of people diagnosed and the majority of people afflicted do not
+        engage in criminal activity, especially if given proper treatment and social support.
+    """)
 
 elif st.session_state.page == 6: # Victims
     st.markdown("""
