@@ -34,19 +34,14 @@ def increment_page():
 
 #-------Page start-------
 
-"""
-# Murder history
-"""
-
 if st.session_state.page == 0:
     text_block = st.markdown("""
+    # Murder history
     The project “Murder History” is dedicated to serial killers, their histories, motives,
     and analysis related to origin, sex, occupation of murders.
     Referring to the datasets made publicly available by the wikidata,
     we are aiming to understand which criteria have been decisive in committing murders.
-    """)
-elif st.session_state.page == 1:
-    text_block = st.markdown("""
+
     **The investigation tries to answer some question to better cover the topic:**
 
     * Which countries do the most serial killers originate from? 
@@ -58,6 +53,24 @@ elif st.session_state.page == 1:
     * Who had the biggest number of victims? 
     * What penalties did they receive? 
     """)
+elif st.session_state.page == 1:
+    text_block = st.markdown("""
+    # Origins
+    As shown in the map below, ... 
+    """)
+    fig = px.choropleth(
+        countries,
+        locations="Country Code",
+        color="Total",
+        hover_name="Country",
+        labels={'Total':'Total serial killers'},
+        color_continuous_scale=px.colors.sequential.Plasma)
+    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, geo_bgcolor="rgba(0,0,0,0)")
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("The US has many more ...")
+    bar = px.bar(countries, y='Total', x='Country')
+    st.plotly_chart(bar, use_container_width=True)
 
 # pie = px.pie(demographics, values='Number of people', names='Demographic')
 # bar = px.bar(demographics.sort_values(by=['Number of people']), y='Number of people', x='Demographic')
@@ -80,5 +93,9 @@ elif st.session_state.page == 1:
 
 but1, but2, _ = st.columns((2,2,8))
 
-with but1: st.button('Previous', on_click=decrement_page, disabled=(st.session_state.page == 0))
-with but2: st.button('Next', on_click=increment_page)
+if st.session_state.page !=0:
+    with but1: st.button('Previous', on_click=decrement_page)
+    with but2: st.button('Next', on_click=increment_page)
+else:
+    but1, but2, _ = st.columns((10,1,1))
+    with but1: st.button('Start journey', on_click=increment_page)
