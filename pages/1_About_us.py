@@ -4,7 +4,7 @@ anita, alina, lars = st.columns(3, gap="medium")
 
 st.markdown("""
 # Anita Vishinskaite
-### Masters degree student in X at the University of Bologna
+### Masters degree student in Digital Humanities and Digital Knowledge at the University of Bologna
 Responsible for **data collection** and **data manipulation**
 
 [Contact](mailto:anita.vishinskaite@studio.unibo.it)

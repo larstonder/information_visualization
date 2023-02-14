@@ -4,6 +4,9 @@ import numpy as np
 import plotly.express as px
 import os
 
+
+# --------- Setup ---------
+
 px.set_mapbox_access_token(open(".mapbox_token").read())
 
 def get_dataframes():
@@ -17,7 +20,7 @@ dfs = get_dataframes()
 
 countries = dfs['countries']
 
-education = dfs['education']
+education = dfs['education_stats']
 education = pd.DataFrame(np.vstack([education.columns, education])).T
 education.columns=['Education', 'Percent']
 
@@ -42,7 +45,7 @@ def increment_page():
 def restart():
     st.session_state.page = 0
 
-# --- Page start ---
+# --------- Page start ---------
 
 if st.session_state.page == 0: # INTRO
     st.markdown("""
@@ -79,35 +82,51 @@ elif st.session_state.page == 1: # ORIGINS
     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, geo_bgcolor="rgba(0,0,0,0)")
     st.plotly_chart(fig, use_container_width=True)
 
-    st.markdown("The US has many more ...")
+    st.write("The US has many more ...")
     bar = px.bar(countries, y='Total', x='Country')
     st.plotly_chart(bar, use_container_width=True)
 
-elif st.session_state.page == 2:
     st.markdown("""
-        # Serial killers per capita
+        ## Serial killers per 100, 000 people
+        Something about iceland and Estonia
     """)
+    fig = px.choropleth(
+        countries,
+        locations="Country Code",
+        color='Rate per 100,000',
+        hover_name="Country",
+        labels={'Rate per 100,000':'Rate per 100,000'},
+        color_continuous_scale=px.colors.sequential.Plasma)
+    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, geo_bgcolor="rgba(0,0,0,0)")
+    st.plotly_chart(fig, use_container_width=True)
 
-elif st.session_state.page == 3: # Genders
+elif st.session_state.page == 2: # Genders
     st.markdown("""
         # Divison between genders
-        Say something about the fact that there is one intersex and two trans women?
-    """)
+        There are in total 1099 people in the world that can be categorized as serial killers.
+        Of these, there are **946 males**, **134 females**, **two trans females** and **one intersex**.
+        """)
+    demographics = demographics[demographics['Demographic'] != 'Total']
     fig = px.bar(
-        demographics,
+        demographics.sort_values(by='Number of people', ascending=False),
         x='Demographic',
         y='Number of people')
     st.plotly_chart(fig, use_container_width=True)
-    st.write("Divison between just males and females")
+    st.markdown("""
+        That means that males account for a staggering **87.3%** of all serial killers.
+        Women, on the other hand, account for almost all the rest, with **12.4%**.
+    """)
     fig = px.pie(
-        demographics.loc[demographics['Demographic'].isin(['Males', 'Females'])],
+        demographics,
+        # demographics.loc[demographics['Demographic'].isin(['Males', 'Females'])],
         values='Number of people',
         names='Demographic')
     st.plotly_chart(fig, use_container_width=True)
 
-elif st.session_state.page == 4: # Education
+elif st.session_state.page == 3: # Education
     st.markdown("""
         # Education
+        Need some comments here
     """)
     # st.write(education)
     fig = px.pie(
@@ -116,52 +135,48 @@ elif st.session_state.page == 4: # Education
     )
     st.plotly_chart(fig, use_container_width=True)
 
-elif st.session_state.page == 5: # 
-    st.markdown("""
-        # Occupations
-        Here we can see the 10 most common occupations in total. Etc.
-    """)
-    fig = px.bar(
-        occupation[:10],
-        x="Occupation",
-        y=["Male", "Female"])
-    st.plotly_chart(fig, use_container_width=True)
+elif st.session_state.page == 4: #
+    st.markdown("# Occupations")
+    options = st.selectbox(
+        'What gender do you wish to view data for?',
+        ('Total', 'Female', 'Male'))
+    
+    if options == 'Total':
+        st.markdown("""
+            Here we can see the 10 most common occupations in total. Etc.
+        """)
+        fig = px.bar(
+            occupation[:10],
+            x="Occupation",
+            y=["Male", "Female"])
+        st.plotly_chart(fig, use_container_width=True)
+    elif options == 'Male':
+        st.write("Here we can see the 10 most common occupations for males. Etc.")
+        fig = px.bar(
+            occupation.iloc[:, [0,1]].sort_values(by="Male", ascending=False)[:10],
+            x="Occupation",
+            y="Male")
+        st.plotly_chart(fig, use_container_width=True)
+    elif options == 'Female':
+        st.write("Here we can see the 10 most common occupations for females. Etc.")
+        fig = px.bar(
+            occupation.iloc[:, [0,2]].sort_values(by="Female", ascending=False)[:10],
+            x="Occupation",
+            y="Female")
+        st.plotly_chart(fig, use_container_width=True)
 
-    st.write("Here we can see the 10 most common occupations for males. Etc.")
-    fig = px.bar(
-        occupation.iloc[:, [0,1]].sort_values(by="Male", ascending=False)[:10],
-        x="Occupation",
-        y="Male")
-    st.plotly_chart(fig, use_container_width=True)
 
-    st.write("Here we can see the 10 most common occupations for femals. Etc.")
-    fig = px.bar(
-        occupation.iloc[:, [0,2]].sort_values(by="Female", ascending=False)[:10],
-        x="Occupation",
-        y="Female")
-    st.plotly_chart(fig, use_container_width=True)
-
-
-elif st.session_state.page == 6: # Mental conditions
+elif st.session_state.page == 5: # Mental conditions
     st.markdown("""
         # Mental conditions
     """)
 
-    # st.write(mental)
-
-    # st.write("Here we can see the 10 most common mental conditions")
-    # fig = px.bar(
-    #     occupation.iloc[:, [0,1]].sort_values(by="Male", ascending=False)[:10],
-    #     x="Occupation",
-    #     y="Male")
-    # st.plotly_chart(fig, use_container_width=True)
-
-elif st.session_state.page == 7: # Victims
+elif st.session_state.page == 6: # Victims
     st.markdown("""
         # Number of victims
     """)
     options = st.selectbox(
-        'What gender do you wish to view?',
+        'What gender do you wish to view data for?',
         ('Total', 'Female', 'Male')
         )
     
@@ -177,29 +192,103 @@ elif st.session_state.page == 7: # Victims
     victims_male.set_index('Rank', drop=True, inplace=True)
 
     if options == 'Total':
-        st.write("Total")
-        st.dataframe(victims.iloc[:,[0,1,2,3]][:10], use_container_width=True)
+        # st.dataframe(victims.iloc[:,[0,1,2,3]], use_container_width=True)
+        st.markdown("""
+            This is the ten serial killers with the most victims.
+            We can see from the data that all in the top 10 are male. In fact,
+            the first female on the list is all the way down in nr. 17,
+            which is Irina Gaidamachuk from Russia with 17 victims.
+        """)
+        fig = px.bar(
+            victims[:10],
+            x='Serial Killer',
+            y='Victims',
+            hover_data=['Serial Killer', 'Victims', 'Gender'])
+        st.plotly_chart(fig, use_container_width=True)
+        st.markdown("""
+            We can seem to see a trend forming:
+            Again, males account for most victims. Now at an all time high, a staggering
+            **91.1%** of all victims are killed by males. Since the number of male serial killers
+            were at 87.3%, that means that each male serial killer in average has more
+            victims than the females, who now account for **8.92%** of the victims.
+        """)
+        division = pd.DataFrame({
+            'Gender': ['Male', 'Female'],
+            'Victims': [victims_male['Victims'].sum(), victims_female['Victims'].sum()]}
+            )
+        fig = px.pie(division, values='Victims', names='Gender')
+        st.plotly_chart(fig)
     elif options == 'Male':
-        st.write("Males")
-       
-        st.dataframe(victims_male.iloc[:,[0,2,3]][:10], use_container_width=True)
-    else:
-        st.write("Females")
-        st.dataframe(victims_female.iloc[:,[0,2,3]], use_container_width=True)
+        # st.dataframe(victims_male.iloc[:,[0,2,3]][:10], use_container_width=True)
+        st.write("This is the ten male serial killers with the most victims...")
+        fig = px.bar(
+            victims_male[:10],
+            x='Serial Killer',
+            y='Victims',
+            hover_data=['Serial Killer', 'Victims'])
+        st.plotly_chart(fig, use_container_width=True)
+    elif options == 'Female':
+        # st.dataframe(victims_female.iloc[:,[0,2,3]], use_container_width=True)
+        st.write("This is the ten female serial killers with the most victims...")
+        fig = px.bar(
+            victims_female[:10],
+            x='Serial Killer',
+            y='Victims',
+            hover_data=['Serial Killer', 'Victims'])
+        st.plotly_chart(fig, use_container_width=True)
 
-    st.write("How do the genders compare?")
-    division = pd.DataFrame({
-        'Gender': ['Male', 'Female'],
-        'Victims': [victims_male['Victims'].sum(), victims_female['Victims'].sum()]}
-        )
-    # st.write(division)
-    fig = px.pie(division, values='Victims', names='Gender')
-    st.plotly_chart(fig)
-
-elif st.session_state.page == 8:
+elif st.session_state.page == 7:
     st.markdown("""
         # Penalties
     """)
+
+    options = st.selectbox(
+        'What gender do you wish to view data for?',
+        ('Total', 'Female', 'Male')
+        )
+    
+    penalty = penalty[penalty['Total'] != 0]
+    penalty['Rank'] = range(1, len(penalty)+1)
+    penalty.set_index('Rank', drop=True, inplace=True)
+
+    penalty_female = penalty.loc[:, penalty.columns != 'Male']
+    penalty_female = penalty_female[penalty_female['Female'] != 0]
+    penalty_female['Rank'] = range(1, len(penalty_female)+1)
+    penalty_female.set_index('Rank', drop=True, inplace=True)
+
+    penalty_male = penalty.loc[:, penalty.columns != 'Female']
+    penalty_male['Rank'] = range(1, len(penalty_male)+1)
+    penalty_male.set_index('Rank', drop=True, inplace=True)
+
+    if options == 'Total':
+        # st.dataframe(penalty.iloc[:,[0,1,2,3]][:10], use_container_width=True)
+        st.markdown("""
+            Here we can see the ten most common penalties. As one would assume,
+            most serial killers are given either capital punishment or life imprisonment.
+            What may be surprising to some is the fact that capital punishment,
+            or the death penalty, is the most common out of all punishments.
+            This is probably due to the fact that the country with the most serial killers is the US,
+            where death penalties are still allowed and widely practiced.
+        """)
+        fig = px.bar(penalty[:10], x='Penalty', y=['Male', 'Female'])
+        st.plotly_chart(fig, use_container_width=True)
+        # st.write("How do the genders compare?")
+        # division = pd.DataFrame({
+        #     'Gender': ['Male', 'Female'],
+        #     'Penalty': [penalty['Male'].sum(), penalty['Female'].sum()]}
+        #     )
+        # fig = px.pie(division, values='Penalty', names='Gender')
+        # st.plotly_chart(fig)
+    elif options == 'Male':
+        # st.dataframe(penalty_male.iloc[:, [0,1]], use_container_width=True)
+        st.write("What can we see from this data?")
+        fig = px.bar(penalty_male[:10], x='Penalty', y='Male')
+        st.plotly_chart(fig, use_container_width=True)
+    elif options == 'Female':
+        st.write("What can we see from this data?")
+        # st.dataframe(penalty_female.iloc[:, [0,1]], use_container_width=True)
+        fig = px.bar(penalty_female[:10], x='Penalty', y='Female')
+        st.plotly_chart(fig, use_container_width=True)
 
 else:
     st.markdown("""
@@ -212,7 +301,7 @@ else:
         51% of serial killers got capital punishment, while 38,6% get life imprisonment.
     """)
 
-# --- Buttons ---
+# --------- Buttons ---------
 
 but1, but2, _ = st.columns((2,2,8))
 
