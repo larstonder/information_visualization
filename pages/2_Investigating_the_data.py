@@ -168,8 +168,44 @@ elif st.session_state.page == 4: #
 
 elif st.session_state.page == 5: # Mental conditions
     st.markdown("""
-        # Mental conditions
+        # Mental illnesses
     """)
+
+    options = st.selectbox(
+        'What gender do you wish to view data for?',
+        ('Total', 'Female', 'Male')
+        )
+    
+    mental = mental[mental['Total'] != 0]
+    mental['Rank'] = range(1, len(mental)+1)
+    mental.set_index('Rank', drop=True, inplace=True)
+
+    mental_female = mental.loc[:, mental.columns != 'Male']
+    mental_female = mental_female[mental_female['Female'] != 0]
+    mental_female['Rank'] = range(1, len(mental_female)+1)
+    mental_female.set_index('Rank', drop=True, inplace=True)
+
+    mental_male = mental.loc[:, mental.columns != 'Female']
+    mental_male['Rank'] = range(1, len(mental_male)+1)
+    mental_male.set_index('Rank', drop=True, inplace=True)
+
+    if options == 'Total':
+        # st.dataframe(penalty.iloc[:,[0,1,2,3]][:10], use_container_width=True)
+        st.markdown("""
+            Here we can see the ten most common mental illnesses.
+        """)
+        fig = px.bar(mental[:10], x='Mental Illness', y=['Male', 'Female'])
+        st.plotly_chart(fig, use_container_width=True)
+    elif options == 'Male':
+        # st.dataframe(penalty_male.iloc[:, [0,1]], use_container_width=True)
+        st.write("What can we see from this data?")
+        fig = px.bar(mental_male[:10], x='Mental Illness', y='Male')
+        st.plotly_chart(fig, use_container_width=True)
+    elif options == 'Female':
+        st.write("What can we see from this data?")
+        # st.dataframe(penalty_female.iloc[:, [0,1]], use_container_width=True)
+        fig = px.bar(mental_female[:10], x='Mental Illness', y='Female')
+        st.plotly_chart(fig, use_container_width=True)
 
 elif st.session_state.page == 6: # Victims
     st.markdown("""
@@ -192,7 +228,6 @@ elif st.session_state.page == 6: # Victims
     victims_male.set_index('Rank', drop=True, inplace=True)
 
     if options == 'Total':
-        # st.dataframe(victims.iloc[:,[0,1,2,3]], use_container_width=True)
         st.markdown("""
             This is the ten serial killers with the most victims.
             We can see from the data that all in the top 10 are male. In fact,
@@ -219,7 +254,6 @@ elif st.session_state.page == 6: # Victims
         fig = px.pie(division, values='Victims', names='Gender')
         st.plotly_chart(fig)
     elif options == 'Male':
-        # st.dataframe(victims_male.iloc[:,[0,2,3]][:10], use_container_width=True)
         st.write("This is the ten male serial killers with the most victims...")
         fig = px.bar(
             victims_male[:10],
@@ -228,7 +262,6 @@ elif st.session_state.page == 6: # Victims
             hover_data=['Serial Killer', 'Victims'])
         st.plotly_chart(fig, use_container_width=True)
     elif options == 'Female':
-        # st.dataframe(victims_female.iloc[:,[0,2,3]], use_container_width=True)
         st.write("This is the ten female serial killers with the most victims...")
         fig = px.bar(
             victims_female[:10],
@@ -272,13 +305,6 @@ elif st.session_state.page == 7:
         """)
         fig = px.bar(penalty[:10], x='Penalty', y=['Male', 'Female'])
         st.plotly_chart(fig, use_container_width=True)
-        # st.write("How do the genders compare?")
-        # division = pd.DataFrame({
-        #     'Gender': ['Male', 'Female'],
-        #     'Penalty': [penalty['Male'].sum(), penalty['Female'].sum()]}
-        #     )
-        # fig = px.pie(division, values='Penalty', names='Gender')
-        # st.plotly_chart(fig)
     elif options == 'Male':
         # st.dataframe(penalty_male.iloc[:, [0,1]], use_container_width=True)
         st.write("What can we see from this data?")
