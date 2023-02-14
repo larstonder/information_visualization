@@ -7,8 +7,6 @@ import os
 
 # --------- Setup ---------
 
-px.set_mapbox_access_token(open(".mapbox_token").read())
-
 def get_dataframes():
     directory = 'Data'
     dfs = {}
