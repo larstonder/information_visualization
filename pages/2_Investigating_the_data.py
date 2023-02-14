@@ -109,7 +109,7 @@ elif st.session_state.page == 4: # Education
     st.markdown("""
         # Education
     """)
-    st.write(education)
+    # st.write(education)
     fig = px.pie(
         education,
         values='Percent'
@@ -147,7 +147,7 @@ elif st.session_state.page == 6: # Mental conditions
         # Mental conditions
     """)
 
-    st.write(mental)
+    # st.write(mental)
 
     # st.write("Here we can see the 10 most common mental conditions")
     # fig = px.bar(
