@@ -92,7 +92,7 @@ elif st.session_state.page == 1: # ORIGINS
     st.markdown("""
         ## Serial killers per 100, 000 people
         While the US still ranks highly when counting the number of serial killers per 100, 000 people,
-        we now have some interesting outliers that we coulnd't see before. As an example,
+        we now have some interesting outliers that we couldn't see before. As an example,
         countries such as Australia actually ranks higher, with approximately 0.02 more serial killers
         per 100, 000 than the US. Surprisingly, the two highest ranking countries are Iceland and Estonia,
         with respectively 0.27 and 0.29 serial killers per 100, 000 people.
